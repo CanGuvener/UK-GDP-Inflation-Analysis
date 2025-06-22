@@ -1,0 +1,445 @@
+LOG FILE
+
+
+. *opening log file
+. log using project.log, replace
+------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\ceyci\OneDrive\Masaüstü\project.log
+  log type:  text
+ opened on:   3 Mar 2024, 14:22:54
+
+. 
+. 
+. 
+. *opening our dataset
+. *the data is obtained quarterly by Office of National Statistics 
+. use "C:\Users\ceyci\OneDrive\Masaüstü\Study\STATA docs\project_variables_clean_01.03.dta"
+
+. 
+.         
+. 
+. *seasonally adjusted quarterly gdp is used for gdp values
+. *https://fred.stlouisfed.org
+. sum gdp 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+         gdp |         47    524271.6    68235.51     424704     679198
+
+. 
+. 
+. *RPI values are used for inflation rates
+. *https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/doge/mm23
+. sum inflation 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   inflation |         47    .0465957      .04417       .007       .197
+
+. 
+. 
+. *For quarterly interest rates, the average of 3 monthly interest rates are used
+. *https://www.bankofengland.co.uk/monetary-policy/the-interest-rate-bank-rate
+. sum interest 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    interest |         47     .007961    .0109694       .001   .0516667
+
+. 
+. 
+. *obtained by Office of National Statistics
+. *https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment/timeseries/mgsx/lms
+. sum unemp
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       unemp |         47    .0511489    .0141513       .036       .082
+
+. 
+. 
+. *quarterly trade balance is calcualted by substracting the imports by the exports
+. *units are seasonally adjusted and in £ million 
+. *https://www.ons.gov.uk/economy/nationalaccounts/balanceofpayments/datasets/uktradegoodsandservicespublicationtables 
+. sum trade 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       trade |         47   -6943.191    7309.254     -26245      13790
+
+. 
+. 
+. *Gross fixed capital formation is used, £ million 
+. *https://www.ons.gov.uk/economy/grossdomesticproductgdp/datasets/grossfixedcapitalformationbysectorandasset
+. sum capital
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     capital |         47     94216.7    9495.778      75936     109290
+
+. 
+. 
+. *numeric value for each quarter to define the data as time series
+. sum time 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        time |         47          24    13.71131          1         47
+
+. 
+. 
+. *checking if there are any missing values 
+. codebook gdp inflation interest unemp trade capital
+
+------------------------------------------------------------------------------------------------------------------------------------------
+gdp                                                                                                                                    GDP
+------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+
+                 Range: [424704,679198]               Units: 1
+         Unique values: 47                        Missing .: 0/47
+
+                  Mean:  524272
+             Std. dev.: 68235.5
+
+           Percentiles:     10%       25%       50%       75%       90%
+                         438103    472452    521219    562790    630575
+
+------------------------------------------------------------------------------------------------------------------------------------------
+inflation                                                                                                                              RPI
+------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (float)
+
+                 Range: [.007,.197]                   Units: .001
+         Unique values: 29                        Missing .: 0/47
+
+                  Mean: .046596
+             Std. dev.:  .04417
+
+           Percentiles:     10%       25%       50%       75%       90%
+                            .02      .025      .031       .04      .135
+
+------------------------------------------------------------------------------------------------------------------------------------------
+interest                                                                                                                     Interest Rate
+------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (float)
+
+                 Range: [.001,.0516667]               Units: 1.000e-07
+         Unique values: 14                        Missing .: 0/47
+
+                  Mean: .007961
+             Std. dev.: .010969
+
+           Percentiles:     10%       25%       50%       75%       90%
+                           .001   .004167      .005   .006667     .0175
+
+------------------------------------------------------------------------------------------------------------------------------------------
+unemp                                                                                                                    Unemployment Rate
+------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (float)
+
+                 Range: [.036,.082]                   Units: .001
+         Unique values: 29                        Missing .: 0/47
+
+                  Mean: .051149
+             Std. dev.: .014151
+
+           Percentiles:     10%       25%       50%       75%       90%
+                           .038       .04      .047      .057      .078
+
+------------------------------------------------------------------------------------------------------------------------------------------
+trade                                                                                                                        Trade Balance
+------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (int)
+
+                 Range: [-26245,13790]                Units: 1
+         Unique values: 47                        Missing .: 0/47
+
+                  Mean: -6943.19
+             Std. dev.:  7309.25
+
+           Percentiles:      10%       25%       50%       75%       90%
+                          -16622     -8725     -7259     -3966      1158
+
+------------------------------------------------------------------------------------------------------------------------------------------
+capital                                                                                                     Gross Fixed Capital Formatioin
+------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+
+                 Range: [75936,109290]                Units: 1
+         Unique values: 47                        Missing .: 0/47
+
+                  Mean: 94216.7
+             Std. dev.: 9495.78
+
+           Percentiles:     10%       25%       50%       75%       90%
+                          78655     85844     97427    100943    106086
+
+. 
+. 
+. 
+. 
+. 
+. *generating the explanained variable ln(gdp)
+. *It is appropriate for this model, to use a logarithm for gdp; it normalizes the data, helps interpreting the coefficient in terms of pe
+> rcentage which is suitable for observing the changes in the data 
+. gen gdp_log = log(gdp)
+
+. 
+. 
+. 
+. 
+. *generating trade balance as a percentage of gdp, to use as a explanatory variable; a standard way of the measure, provides a relative m
+> easure of the importance of the trade balance to the economy, it is also the appropriate way of use for policy making. 
+. gen trade_gdp = trade/gdp 
+
+. 
+. 
+. 
+. *Labelling new variables
+. label variable gdp_log "ln(GDP)"
+
+. label variable trade_gdp "Trade Balance / GDP"
+
+. 
+. 
+. 
+. 
+. *having a look to the inflation and gdp values graphically, to generate a basic idea
+. graph twoway lowess inflation gdp_log
+
+. 
+. 
+. 
+. 
+. *Doing the regression
+. 
+. *ln(gdp) = B0 + B1*inflation_rate + B2*interest_rate + B3*unemployment_rate + B4*trade_balance/gdp + B5*gross_fixed_capital_formation
+. 
+. *The chosen model is consistent with the literature on economic growth, and variable relevance
+. regress gdp_log inflation interest unemp trade_gdp capital
+
+      Source |       SS           df       MS      Number of obs   =        47
+-------------+----------------------------------   F(5, 41)        =     95.01
+       Model |  .688840366         5  .137768073   Prob > F        =    0.0000
+    Residual |  .059454073        41  .001450099   R-squared       =    0.9205
+-------------+----------------------------------   Adj R-squared   =    0.9109
+       Total |  .748294439        46   .01626727   Root MSE        =    .03808
+
+------------------------------------------------------------------------------
+     gdp_log | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   inflation |   .7539516   .2285277     3.30   0.002     .2924306    1.215473
+    interest |   1.403362   .9225095     1.52   0.136     -.459684    3.266407
+       unemp |  -2.377291   1.123723    -2.12   0.041    -4.646696   -.1078859
+   trade_gdp |   1.232197   .5784777     2.13   0.039     .0639376    2.400456
+     capital |   7.16e-06   1.89e-06     3.78   0.000     3.34e-06     .000011
+       _cons |   12.57862   .2267259    55.48   0.000     12.12074    13.03651
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Checking for multicollinearity with a VIF test
+. vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+     capital |     10.23    0.097707
+       unemp |      8.02    0.124660
+    interest |      3.25    0.307846
+   inflation |      3.23    0.309392
+   trade_gdp |      1.72    0.582210
+-------------+----------------------
+    Mean VIF |      5.29
+
+. *Since the VIF value is bigger than 10 for capital, there is multicollinearity present
+. 
+. 
+. *Checking multicollinearity again with the correlation matrix, to see the problem more clearly
+. pwcorr inflation unemp interest trade_gdp capital, sig
+
+             | inflat~n    unemp interest trade_~p  capital
+-------------+---------------------------------------------
+   inflation |   1.0000 
+             |
+             |
+       unemp |  -0.3081   1.0000 
+             |   0.0351
+             |
+    interest |   0.7855  -0.2562   1.0000 
+             |   0.0000   0.0821
+             |
+   trade_gdp |  -0.4236   0.1223  -0.2257   1.0000 
+             |   0.0030   0.4128   0.1271
+             |
+     capital |   0.4920  -0.8971   0.4634  -0.3498   1.0000 
+             |   0.0004   0.0000   0.0010   0.0160
+             |
+
+. *As we can see from a(5,2) = -0.8971, there is evidence of multicollinearity between unemployment rate and gross fixed capital formation
+> .
+. 
+. *Since they are both capital variables, we should eliminate one to prevent multicollinearity.  
+. 
+. *Doing the regression without unemployment 
+. regress gdp_log inflation interest trade_gdp capital
+
+      Source |       SS           df       MS      Number of obs   =        47
+-------------+----------------------------------   F(4, 42)        =    108.65
+       Model |   .68235038         4  .170587595   Prob > F        =    0.0000
+    Residual |  .065944059        42  .001570097   R-squared       =    0.9119
+-------------+----------------------------------   Adj R-squared   =    0.9035
+       Total |  .748294439        46   .01626727   Root MSE        =    .03962
+
+------------------------------------------------------------------------------
+     gdp_log | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   inflation |   .8077536   .2363181     3.42   0.001     .3308443    1.284663
+    interest |   .6818005   .8919013     0.76   0.449    -1.118129     2.48173
+   trade_gdp |    1.81759   .5286053     3.44   0.001     .7508213    2.884359
+     capital |   .0000109   7.31e-07    14.88   0.000     9.40e-06    .0000123
+       _cons |    12.1177   .0652752   185.64   0.000     11.98597    12.24943
+------------------------------------------------------------------------------
+
+. 
+. *Our new model is: 
+. *ln(gdp) = B0 + B1*inflation_rate + B2*interest_rate + B3*trade_balance/gdp + B4*gross_fixed_capital_formation
+. 
+. *Since the p-value is smaller than 0.05, we can state that the model is statistically significant at 5% significance level
+. *The adjusted R-squared value is 0.9035, so we can state that the model explains approximately 90.35% of the variability in the dependen
+> t variable
+. *We can also claim that the causal relation between interest rate and GDP growth is insignificant at 5% significance level, since the t-
+> value for interest is 0.57 which is lower than 1.96
+. *For the rest of the explanatory variables (inflation rate, trade balance, gross fixed capital formation), the the relationship is signi
+> ficant at 5%, according to each t-value. 
+. 
+. 
+. vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+   inflation |      3.19    0.313271
+    interest |      2.80    0.356590
+     capital |      1.41    0.708950
+   trade_gdp |      1.32    0.754951
+-------------+----------------------
+    Mean VIF |      2.18
+
+. *There is no multicollinearity in the new model, according to the VIF test
+. 
+. 
+. 
+. *Using Ramsey REST Test to test for omitted-variable bias
+. ovtest
+
+Ramsey RESET test for omitted variables
+Omitted: Powers of fitted values of gdp_log
+
+H0: Model has no omitted variables
+
+F(3, 39) =   1.68
+Prob > F = 0.1878
+
+. *Based on the Ramsey REST Test, we do not have sufficient evidence to conclude that the model has omitted variables in 95% confidence in
+> terval, since the p-value is greater than the associated F-value
+. 
+. 
+. *Using Added Variable plots to check for outliers
+. avplots
+
+. *There are no outliers spotted on the avplots 
+. 
+. 
+. *Checking for Heteroskedasticity with a Breush-Pagan Test. Breush-Pagan is predominantly used in the literaure for heteroskedasticity te
+> sting. 
+. estat hettest
+
+Breusch–Pagan/Cook–Weisberg test for heteroskedasticity 
+Assumption: Normal error terms
+Variable: Fitted values of gdp_log
+
+H0: Constant variance
+
+    chi2(1) =   2.86
+Prob > chi2 = 0.0908
+
+. *We cannot reject homoskedasticity since the p-value is greater than 0.05, therefore there is no heteroskedasticity problem in the model
+> . 
+. 
+. 
+. *time variable is set for Breush-Godfrey Test
+. tsset time
+
+Time variable: time, 1 to 47
+        Delta: 1 unit
+
+. 
+. *Testing for serial correlation with Breush-Godfrey Test 
+. estat bgodfrey, lags(1)
+
+Breusch–Godfrey LM test for autocorrelation
+---------------------------------------------------------------------------
+    lags(p)  |          chi2               df                 Prob > chi2
+-------------+-------------------------------------------------------------
+       1     |         29.097               1                   0.0000
+---------------------------------------------------------------------------
+                        H0: no serial correlation
+
+. 
+. *there is serial correlation present, since the p-value is smaller than 0.05
+. 
+. 
+.          
+. *Using the Newey-West HAC method to fix serial correlation
+. newey gdp_log inflation interest trade_gdp capital, lag(12)
+
+Regression with Newey–West standard errors      Number of obs     =         47
+Maximum lag = 12                                F(  4,        42) =     564.14
+                                                Prob > F          =     0.0000
+
+------------------------------------------------------------------------------
+             |             Newey–West
+     gdp_log | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   inflation |   .8077536   .2745029     2.94   0.005     .2537844    1.361723
+    interest |   .6818005   1.196608     0.57   0.572    -1.733053    3.096654
+   trade_gdp |    1.81759   .4977237     3.65   0.001     .8131429    2.822037
+     capital |   .0000109   1.02e-06    10.64   0.000     8.81e-06    .0000129
+       _cons |    12.1177   .0761225   159.19   0.000     11.96408    12.27132
+------------------------------------------------------------------------------
+
+. *Inflation is still statistically significant at 95% confidence interval
+. 
+. 
+. *Creating a residuals variable to check the normality of residuals
+. predict e, residuals
+
+. 
+. 
+. *Checking for normality with kernel density plot
+. kdensity e, normal
+(n() set to 47)
+
+. *The distribution shows that the assumptions of normality of the residuals is reasonably met
+. 
+. 
+. 
+. 
+.          
+.          
+. log close
+      name:  <unnamed>
+       log:  C:\Users\ceyci\OneDrive\Masaüstü\project.log
+  log type:  text
+ closed on:   3 Mar 2024, 14:22:58
+------------------------------------------------------------------------------------------------------------------------------------------
+
+. 
+. 
