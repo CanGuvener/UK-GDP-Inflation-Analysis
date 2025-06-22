@@ -13,6 +13,6 @@ Using a multiple linear regression model in STATA, I explored how inflation, int
 
 ## Tools
 - STATA
-- Time-series econometrics
+- Time-series analysis
 - Regression diagnostics (VIF, Breusch-Pagan, Newey-West, etc.)
 
