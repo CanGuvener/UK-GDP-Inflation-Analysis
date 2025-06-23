@@ -4,8 +4,8 @@ Independent research project analyzing the relationship between GDP growth and i
 This repository contains my independent research project for Queen Mary University of London. The project investigates the relationship between inflation and GDP growth in the UK using time-series data from 2012 to 2023, obtained from the Office for National Statistics.
 
 ## Contents
-- `Can_Guvener_IRP`: Final research paper
-- `project.log`: STATA output log
+- `Can_Guvener - IRP`: Final research paper
+- `project_final_log.do`: STATA output log
 - `project.do`: STATA script
 
 ## Summary
