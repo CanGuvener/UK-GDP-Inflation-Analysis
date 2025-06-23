@@ -5,8 +5,8 @@ This repository contains my independent research project for Queen Mary Universi
 
 ## Contents
 - `Can_Guvener - IRP`: Final research paper
-- `project_final_log.do`: STATA output log
-- `project.do`: STATA script
+- `project_final_log.do`: STATA script
+- `LOG FILE - Can Guvener`: STATA output log
 
 ## Summary
 Using a multiple linear regression model in STATA, I explored how inflation, interest rates, trade balance, and capital formation impact GDP. Results showed a significant positive relationship between inflation and GDP growth.
